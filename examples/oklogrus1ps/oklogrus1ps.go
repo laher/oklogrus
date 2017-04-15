@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/url"
-	"os"
 	"time"
 
 	"github.com/oklog/oklog/pkg/forward"
@@ -22,11 +21,7 @@ func main() {
 	l := logrus.New()
 
 	f := forward.NewBufferedForwarder(urls, "oklogrus:", 5)
-	w, err := f.Forward()
-	if err != nil {
-		log.Printf("Error forwarding logs: %s", err)
-		os.Exit(1)
-	}
+	w := f.Forward()
 	l.Out = w
 	l.Infof("hi")
 	for {
