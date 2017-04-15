@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"net/url"
 	"time"
@@ -21,7 +22,13 @@ func main() {
 	l := logrus.New()
 
 	f := forward.NewBufferedForwarder(urls, "oklogrus:", 5)
-	w := f.Forward()
+	r, w := io.Pipe()
+	go func() {
+		err := f.Forward(r)
+		if err != nil {
+			log.Fatalf("Error forwarding: %v", err)
+		}
+	}()
 	l.Out = w
 	l.Infof("hi")
 	for {
